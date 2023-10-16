@@ -30,9 +30,9 @@ if (isset($_POST["btnEntrada"])) {
         $result = $mysqli->query($sql);
       
         if ($result && $result->num_rows === 0) {
-          $usuarioError = "Usuario no encontrado en la tabla de usuarios.";
+            $usuarioError = "Usuario no encontrado en la tabla de usuarios.";
         } else {
-          $claveError ="Clave incorrecta.";
+            $claveError ="Clave incorrecta.";
         }
       }
       }
@@ -51,7 +51,7 @@ if (isset($_POST["btnEntrada"])) {
           // La clave y el DNI son válidos
       
           // Realiza una consulta SQL para obtener hora_entrada
-          $sql = "SELECT hora_entrada FROM asistencia WHERE dni = '$dni' AND fecha = CURDATE()";
+          $sql = "SELECT hora_entrada FROM asistencia WHERE dni = '$dni' AND fecha = CURDATE() ";
           $result = $mysqli->query($sql);
       
           if ($result && $result->num_rows > 0) {
@@ -73,20 +73,18 @@ if (isset($_POST["btnEntrada"])) {
               while ($mysqli->more_results()) {
                   $mysqli->next_result();
               }
-      
+
               // Calculate the difference between hora_entrada and hora_salida
               $sql = "UPDATE asistencia SET total_horas = TIMEDIFF(hora_salida, hora_entrada) WHERE dni = '$dni' AND fecha = CURDATE()";
               $result = $mysqli->query($sql);
       
-              if ($result) {
+              $sql = "SELECT total_horas FROM asistencia WHERE dni = '$dni' AND fecha = CURDATE()";
+    $result = $mysqli->query($sql);
+    if ($result && $result->num_rows > 0) {
                   // Retrieve the total_horas value from the database
-                  $sql = "SELECT total_horas FROM asistencia WHERE dni = '$dni' AND fecha = CURDATE()";
-                  $result = $mysqli->query($sql);
-            
-                  if ($result && $result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    $total_horas = $row["total_horas"];
-                    echo "Exit record updated successfully. Total horas calculadas: $total_horas";
+                  $row = $result->fetch_assoc();
+                  $total_horas = $row["total_horas"];
+                  echo "Exit record updated successfully. Total horas: $total_horas";
                   } else {
                     echo "Error al calcular y actualizar total_horas.";
                   }
@@ -96,12 +94,18 @@ if (isset($_POST["btnEntrada"])) {
             } else {
               echo "No se encontró la hora de entrada.";
             }
-          } else {
-            echo "No entrance record found for today.";
-          }
         } else {
-          echo "Usuario o clave incorrectos.";
+            {
+        // Comprueba si el error es en el DNI o la clave
+        $sql = "SELECT * FROM usuarios WHERE dni = '$dni'";
+        $result = $mysqli->query($sql);
+      
+        if ($result && $result->num_rows === 0) {
+            $usuarioError = "Usuario no encontrado en la tabla de usuarios.";
+        } else {
+            $claveError ="Clave incorrecta.";
         }
-      }
-
+        }
+    }
+}
 ?>
