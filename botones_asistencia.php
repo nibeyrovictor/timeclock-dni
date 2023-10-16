@@ -109,3 +109,26 @@ if (isset($_POST["btnEntrada"])) {
     }
 }
 ?>
+
+<?php
+if (isset($_POST["btnAdmin"])) {
+  // Obtén el rol del usuario desde la base de datos
+  $dni = $_POST["dni"];
+  $clave = $_POST["clave"];
+  $sql = "SELECT rol FROM usuarios WHERE dni = '$dni' AND clave = '$clave'";
+  $result = $mysqli->query($sql);
+  
+  if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $rol = $row['rol'];
+    
+    if ($rol == "admin") {
+      // El usuario es un administrador, redirige a la página de administrador
+      header("Location: admin.php");
+      exit; // Asegúrate de salir para evitar que se procese el resto de la página
+    } else {
+      echo "No tienes permisos de administrador.";
+    }
+  }
+}
+?>

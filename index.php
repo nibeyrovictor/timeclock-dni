@@ -12,6 +12,8 @@
       }, delay);
     }
   </script>
+
+
   <!-- Agrega la referencia a Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -29,11 +31,20 @@
       <input type="password" name="clave" class="form-control form-control-lg" id="clave" placeholder="Clave" required>
       <span style="color: red;"><?php echo $claveError; ?></span>
     </div>
+  
     <button type="submit" name="btnEntrada" class="btn btn-primary btn-lg" onclick="refreshPageAfterDelay(5000)">Entrada</button>
     <button type="submit" name="btnSalida" class="btn btn-danger btn-lg" onclick="refreshPageAfterDelay(5000)">Salida</button>
+    <button type="submit" name="btnVerHorario" class="btn btn-success btn-lg">Ver mi horario por mes</button>
+    <form action="admin.php" method="post">
+  <button type="submit" name="btnAdmin" class="btn btn-primary btn-lg">Admin</button>
+</form>
+
+
 
   </form>
 </div>
+<?php include 'tabla_usuarios_asistencia.php' ?>  
+
 <!-- Agrega la referencia a Bootstrap 5 JavaScript (opcional) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
