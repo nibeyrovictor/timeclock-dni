@@ -84,7 +84,7 @@ if (isset($_POST["btnEntrada"])) {
                   // Retrieve the total_horas value from the database
                   $row = $result->fetch_assoc();
                   $total_horas = $row["total_horas"];
-                  echo "Exit record updated successfully. Total horas: $total_horas";
+                  echo '<div class="alert alert-success"> Salida registrada correctamente.  ' . $total_horas . '</div>';
                   } else {
                     echo "Error al calcular y actualizar total_horas.";
                   }

@@ -8,19 +8,23 @@ if (isset($_POST["btnVerHorario"])) {
   $sql = "SELECT * FROM usuarios WHERE dni = '$dni' AND clave = '$clave'";
   $result = $mysqli->query($sql);
   if ($result && $result->num_rows > 0) {
- // Mostrar el horario por mes
+    // Mostrar el horario por mes
 
-  // Realiza una consulta SQL para obtener todos los meses guardados
-  $sql = "SELECT DISTINCT DATE_FORMAT(fecha, '%m-%Y') AS mes FROM asistencia WHERE dni = '$dni'";
-  $result = $mysqli->query($sql);
+    // Configura la localización en español
+    setlocale(LC_TIME, 'es_ES');
 
-  if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+    // Realiza una consulta SQL para obtener todos los meses guardados
+    $sql = "SELECT DISTINCT DATE_FORMAT(fecha, '%m-%Y') AS mes FROM asistencia WHERE dni = '$dni'";
+    $result = $mysqli->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
         $mes = $row['mes'];
 
         // Extraer el mes y el año
         list($numeroMes, $anio) = explode('-', $mes);
-        $nombreMes = date('F', mktime(0, 0, 0, $numeroMes, 1));
+        $fecha = new DateTime("1970-$numeroMes-01");
+        $nombreMes = $fecha->format('F');
 
         // Mostrar el mes y año y crear una tabla para ese mes
         echo "<h3>Mes: " . $nombreMes . " " . $anio . "</h3>";
@@ -34,16 +38,16 @@ if (isset($_POST["btnVerHorario"])) {
         $resultMes = $mysqli->query($sql);
 
         while ($rowMes = $resultMes->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td>" . $rowMes['fecha'] . "</td>";
-            echo "<td>" . $rowMes['hora_entrada'] . "</td>";
-            echo "<td>" . $rowMes['hora_salida'] . "</td>";
-            echo "<td>" . $rowMes['total_horas'] . "</td>";
+          echo "<tr>";
+          echo "<td>" . $rowMes['fecha'] . "</td>";
+          echo "<td>" . $rowMes['hora_entrada'] . "</td>";
+          echo "<td>" . $rowMes['hora_salida'] . "</td>";
+          echo "<td>" . $rowMes['total_horas'] . "</td>";
 
-            // Suma el tiempo total
-            $totalHoras = sumarHoras($totalHoras, $rowMes['total_horas']);
+          // Suma el tiempo total
+          $totalHoras = sumarHoras($totalHoras, $rowMes['total_horas']);
 
-            echo "</tr>";
+          echo "</tr>";
         }
 
         // Convierte el tiempo total a un formato adecuado
@@ -55,21 +59,21 @@ if (isset($_POST["btnVerHorario"])) {
         echo "</tr>";
 
         echo "</table>";
+      }
+    } else {
+      echo "No se encontraron registros de asistencia para ningún mes.";
     }
-} else {
-    echo "No se encontraron registros de asistencia para ningún mes.";
-}
-} else {
-echo "Verifique sus usuario y clave ingresada.";
-}
-
-
+  } else {
+    echo "Verifique sus usuario y clave ingresada.";
   }
-  function sumarHoras($hora1, $hora2) {
-    $tiempo1 = strtotime("1970-01-01 " . $hora1);
-    $tiempo2 = strtotime("1970-01-01 " . $hora2);
-    $suma = date("H:i:s", $tiempo1 + $tiempo2);
-
-    return $suma;
 }
+
+function sumarHoras($hora1, $hora2) {
+  $tiempo1 = strtotime("1970-01-01 " . $hora1);
+  $tiempo2 = strtotime("1970-01-01 " . $hora2);
+  $suma = date("H:i:s", $tiempo1 + $tiempo2);
+
+  return $suma;
+}
+
 ?>
