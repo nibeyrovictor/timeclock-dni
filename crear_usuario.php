@@ -12,47 +12,66 @@ $apellido = "";
 $nombre = "";
 $legajo = "";
 $rol = "";
-$id_usuario = null;
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Verifica si se envió un ID de usuario para edición
-    if (isset($_POST["id_usuario"])) {
-        $id_usuario = $_POST["id_usuario"];
-    }
+// Verifica si se envió un modo (crear o editar)
+$modo = isset($_POST["modo"]) ? $_POST["modo"] : null;
 
-    // Obtén y valida los datos del formulario
+// Obtén y valida los datos del formulario
+if (isset($_POST["dni"])) {
     $dni = $_POST["dni"];
+}
+if (isset($_POST["clave"])) {
     $clave = $_POST["clave"];
+}
+if (isset($_POST["apellido"])) {
     $apellido = $_POST["apellido"];
+}
+if (isset($_POST["nombre"])) {
     $nombre = $_POST["nombre"];
+}
+if (isset($_POST["legajo"])) {
     $legajo = $_POST["legajo"];
+}
+if (isset($_POST["rol"])) {
     $rol = $_POST["rol"];
+}
 
-    if ($id_usuario === null) {
-        // Estamos creando un nuevo usuario
-        $sql = "INSERT INTO usuarios (dni, clave, apellido, nombre, legajo, rol) VALUES ('$dni', '$clave', '$apellido', '$nombre', '$legajo', '$rol')";
+// Verifica si el formulario se envió y los campos no están vacíos
+if (isset($_POST["crear_usuario"])) {
+    if (empty($dni) || empty($clave) || empty($apellido) || empty($nombre) || empty($legajo)) {
+        $mensaje = "Debe completar todos los campos.";
+    } else {
+        // Verifica si el usuario ya existe
+        $sql = "SELECT dni FROM usuarios WHERE dni='$dni'";
+        $result = $mysqli->query($sql);
 
-        if ($mysqli->query($sql)) {
-            $mensaje = "Usuario creado exitosamente.";
+        if ($result->num_rows > 0) {
+            $mensaje = "El usuario con DNI $dni ya existe.";
         } else {
-            $mensaje = "Error al crear el usuario: " . $mysqli->error;
+            // Estamos creando un nuevo usuario
+            $sql = "INSERT INTO usuarios (dni, clave, apellido, nombre, legajo, rol) VALUES ('$dni', '$clave', '$apellido', '$nombre', '$legajo', '$rol')";
+
+            if ($mysqli->query($sql)) {
+                $mensaje = "Usuario creado exitosamente.";
+            } else {
+                $mensaje = "Error al crear el usuario: " . $mysqli->error;
+            }
         }
     }
 }
-
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Crear o Editar Usuario</title>
+  <title>Crear Usuario</title>
 </head>
 <body>
-  <h1>Crear o Editar Usuario</h1>
+  <h1>Crear Usuario</h1>
   <p><?php echo $mensaje; ?></p>
   <form method="post" action="crear_usuario.php">
-    <input type="hidden" name="id_usuario" value="<?php echo $id_usuario; ?>">
+    <input type="hidden" name="crear_usuario" value="true">
     <label for="dni">DNI:</label>
     <input type="text" name="dni" value="<?php echo $dni; ?>" required>
     <br>
@@ -80,6 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </select>
     <br>
 
+    <input type="hidden" name="modo" value="crear">
     <input type="submit" value="Guardar">
   </form>
 </body>
